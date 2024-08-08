@@ -49,6 +49,9 @@ class RestaurantListScreen extends StatelessWidget {
                         width: 80,
                         height: 80,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(Icons.error, size: 80);
+                        },
                       ),
                     ),
                     title: Text(

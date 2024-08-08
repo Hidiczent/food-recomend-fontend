@@ -43,6 +43,17 @@ class ApiService {
     }
   }
 
+  static Future<List<dynamic>> fetchTopRatedRestaurants() async {
+    final uri = Uri.parse('$baseUrl/topRatedRestaurants');
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load top rated restaurants');
+    }
+  }
+
   static Future<http.Response> register(String firstName, String gender,
       String age, String email, String password) {
     return http.post(

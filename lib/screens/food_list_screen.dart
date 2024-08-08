@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:food_recommend_fontend/api_service.dart';
 import 'package:food_recommend_fontend/ip.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'menu_detail_screen.dart';
 
 class FoodListScreen extends StatelessWidget {
@@ -13,7 +14,6 @@ class FoodListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // automaticallyImplyLeading: false,
         backgroundColor: Color.fromARGB(255, 255, 169, 40),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,6 +89,21 @@ class FoodListScreen extends StatelessWidget {
                           'Restaurant: $restaurantName',
                           style: TextStyle(fontSize: 16),
                         ),
+                        SizedBox(height: 5),
+                        RatingBar.builder(
+                          initialRating: item['ຄະແນນ'].toDouble(),
+                          minRating: 1,
+                          direction: Axis.horizontal,
+                          allowHalfRating: true,
+                          itemCount: 5,
+                          itemSize: 20.0,
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          onRatingUpdate: (rating) {},
+                          ignoreGestures: true,
+                        ),
                       ],
                     ),
                     onTap: () {
@@ -97,7 +112,8 @@ class FoodListScreen extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => MenuDetailScreen(
                             foodName: item['ລາຍການອາຫານ'],
-                            restaurantName: restaurantName ?? 'Unknown Restaurant',
+                            restaurantName:
+                                restaurantName ?? 'Unknown Restaurant',
                           ),
                         ),
                       );
@@ -112,5 +128,3 @@ class FoodListScreen extends StatelessWidget {
     );
   }
 }
-
-

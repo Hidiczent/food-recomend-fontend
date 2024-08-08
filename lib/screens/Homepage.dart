@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:food_recommend_fontend/api_service.dart';
@@ -5,8 +6,12 @@ import 'package:food_recommend_fontend/ip.dart';
 import 'package:food_recommend_fontend/provider/category_provider.dart';
 import 'package:provider/provider.dart';
 import 'menu_detail_screen.dart';
+import 'restaurant_list_screen.dart'; // Import the RestaurantListScreen
 
 class Homepage extends StatefulWidget {
+  final String token;
+  const Homepage({required this.token});
+
   @override
   _HomepageState createState() => _HomepageState();
 }
@@ -14,12 +19,14 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   List<dynamic> _allItems = [];
   List<dynamic> _filteredItems = [];
+  List<dynamic> _topRatedRestaurants = [];
   TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _fetchData();
+    _fetchTopRatedRestaurants();
     _searchController.addListener(() {
       _filterItems(_searchController.text);
     });
@@ -54,12 +61,28 @@ class _HomepageState extends State<Homepage> {
         if (i < otherItems.length) combinedItems.add(otherItems[i]);
       }
 
+      // สุ่มรายการเพื่อไม่ให้การแสดงผลน่าเบื่อ
+      combinedItems.shuffle(Random());
+
       setState(() {
         _allItems = combinedItems;
         _filteredItems = _allItems;
       });
     } catch (e) {
       // handle error
+      print('Failed to load data: $e');
+    }
+  }
+
+  void _fetchTopRatedRestaurants() async {
+    try {
+      var topRatedRestaurants = await ApiService.fetchTopRatedRestaurants();
+      setState(() {
+        _topRatedRestaurants = topRatedRestaurants;
+      });
+    } catch (e) {
+      // handle error
+      print('Failed to load top rated restaurants: $e');
     }
   }
 
@@ -126,6 +149,40 @@ class _HomepageState extends State<Homepage> {
                         ),
                       ),
                     ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: _topRatedRestaurants.map((restaurant) {
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 5.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => RestaurantListScreen(
+                                      restaurantName:
+                                          restaurant['restaurantName'],
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Color.fromARGB(255, 255, 169, 40),
+                              ),
+                              child: Text(
+                                restaurant['restaurantName'],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    SizedBox(height: 10),
                     Text(
                       'Found ${_filteredItems.length} items',
                       style: TextStyle(fontSize: 16),
@@ -196,7 +253,7 @@ class _HomepageState extends State<Homepage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          item['ລາຍການອາຫານ'],
+                                          item['ລາຍການອາຫານ'] ?? '',
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
@@ -204,7 +261,7 @@ class _HomepageState extends State<Homepage> {
                                         ),
                                         SizedBox(height: 5),
                                         Text(
-                                          '${item['ລາຄາ']} ກີບ',
+                                          '${item['ລາຄາ'] ?? ''} ກີບ',
                                           style: TextStyle(
                                             fontSize: 16,
                                             color: Color.fromARGB(

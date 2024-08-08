@@ -27,13 +27,18 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
-        '/main': (context) => MainPage(),
+        '/main': (context) =>
+            MainPage(token: 'your_token_here'), // ส่ง token ตรงนี้
       },
     );
   }
 }
 
 class MainPage extends StatefulWidget {
+  final String token; // เพิ่ม token ตรงนี้
+
+  MainPage({required this.token});
+
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -41,11 +46,17 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    Homepage(),
-    CategoryScreen(),
-    ProfileScreen(),
-  ];
+  late List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      Homepage(token: widget.token), // ส่ง token ไปยัง Homepage
+      CategoryScreen(),
+      ProfileScreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {

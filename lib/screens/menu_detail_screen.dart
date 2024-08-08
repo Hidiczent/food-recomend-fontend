@@ -71,14 +71,9 @@ class MenuDetailScreen extends StatelessWidget {
                     'ລາຄາ: ${item['ລາຄາ'] ?? 'N/A'}',
                     style: TextStyle(fontSize: 18),
                   ),
+                  SizedBox(height: 10),
+                  _buildRatingStars(item['ຄະແນນ']?.toDouble() ?? 0),
                   SizedBox(height: 20),
-                  // Text(
-                  //   'ຮ້ານອາຫານ: $restaurantName',
-                  //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  // ),
-                  SizedBox(
-                    height: 10,
-                  ),
                   ListTile(
                     title: Text(restaurantName ?? 'Unknown Restaurant'),
                     subtitle: Row(
@@ -204,5 +199,23 @@ class MenuDetailScreen extends StatelessWidget {
     } else {
       throw 'Could not launch $url';
     }
+  }
+
+  Widget _buildRatingStars(double rating) {
+    int fullStars = rating.floor();
+    double halfStarThreshold = 0.5;
+    List<Widget> stars = [];
+
+    for (int i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.add(Icon(Icons.star, color: Colors.amber));
+      } else if (i == fullStars && rating - fullStars >= halfStarThreshold) {
+        stars.add(Icon(Icons.star_half, color: Colors.amber));
+      } else {
+        stars.add(Icon(Icons.star_border, color: Colors.amber));
+      }
+    }
+
+    return Row(children: stars);
   }
 }
